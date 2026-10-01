@@ -1,0 +1,189 @@
+KẾ HOẠCH TƯƠNG LAI — Code Universe
+====================================
+Cập nhật 2026-09-30. Trang: https://t-root.github.io/code-universe/
+(push lên main là GitHub Actions tự build và deploy).
+
+
+HIỆN TRẠNG
+----------
+- 4993 node, 422 node gốc, 24 ngôn ngữ.
+- Cả 24 ngôn ngữ đã SẠCH: đạt chỉ tiêu tối thiểu (gaps.mjs "đủ"), đúng
+  định dạng chuẩn (audit.mjs 0 lỗi), đủ hệ sinh thái cơ bản, không tiêu đề
+  trùng. Chi tiết từng đợt xem git log.
+
+
+TRẠNG THÁI ĐỘ SÂU (kiểm tra server/data.db ngày 2026-09-30)
+-----------------------------------------------------------
+✓ = đã đủ sâu: mọi framework, module, thư viện, hàm, method, thuộc tính
+đều có node con chi tiết. ✗ = chưa. Số node = cây con của ngôn ngữ
+(+ số node gốc hệ sinh thái có @LANGUAGE).
+
+ 1. ✓ HTML (400 node) — xong 2026-09-30, kiểm tra lại lần 2 cùng ngày
+      - Đủ 113 thẻ WHATWG; mọi thẻ có nhánh con cho từng thuộc tính riêng
+        (a[href], img[srcset], input[pattern], area[target], th[colspan],
+        script[blocking]...); 26 thuộc tính toàn cục; 22 input type.
+      - 18 thuộc tính ARIA, 13 role, 11 thuộc tính sự kiện (onclick...).
+      - Mọi node có code đều có "## Kết quả".
+ 2. ✓ CSS (566 node + 4 node gốc 11-15 node) — xong 2026-09-30, kiểm tra
+    lại lần 2 cùng ngày
+      - ~165 thuộc tính (cả text-wrap, anchor positioning, scroll-driven
+        animation, scrollbar-*, touch-action, field-sizing, zoom...).
+      - Thuộc tính gộp phân nhánh con (padding, margin, border,
+        border-radius, border-image, outline, background, font, flex, grid,
+        gap, overflow, mask, container, transition, animation...).
+      - Node giá trị cho ~40 thuộc tính (display, position, flex, align-*,
+        text-*, font-weight, cursor, object-fit, filter, transform...).
+      - 49 pseudo-class, 15 pseudo-element, 30 đơn vị, ~45 hàm (cả hàm
+        toán học), 18 at-rule.
+      - Tailwind CSS, Bootstrap, Sass, PostCSS mỗi cái >= 10 node.
+    Cả hai: depth.mjs 0 (danh sách chuẩn mở rộng lần 2), review.mjs sạch
+    (không node rỗng, node lá đều có code, không dòng code > 110 ký tự,
+    không lỗi font), audit.mjs 0, gaps.mjs "đủ", dups.mjs sạch.
+ 3. ✗ JavaScript  (286 node + 76 node gốc)
+ 4. ✗ Python      (207 node + 29 node gốc)
+ 5. ✗ TypeScript  (113 node + 14 node gốc)
+ 6. ✗ Java        (139 node + 17 node gốc)
+ 7. ✗ C#          (129 node + 14 node gốc)
+ 8. ✗ Go          (132 node + 13 node gốc)
+ 9. ✗ Rust        (139 node + 14 node gốc)
+10. ✗ Kotlin      (122 node + 11 node gốc)
+11. ✗ Swift       (130 node +  6 node gốc)
+12. ✗ PHP         (130 node + 10 node gốc)
+13. ✗ C++         (127 node + 12 node gốc)
+14. ✗ C           ( 82 node +  5 node gốc)
+15. ✗ SQL         ( 94 node +  4 node gốc)
+16. ✗ Ruby        ( 87 node +  6 node gốc)
+17. ✗ Dart        ( 85 node +  6 node gốc)
+18. ✗ R           ( 58 node +  4 node gốc)
+19. ✗ Scala       ( 59 node +  4 node gốc)
+20. ✗ Lua         ( 50 node +  4 node gốc)
+21. ✗ Elixir      ( 61 node +  4 node gốc)
+22. ✗ Haskell     ( 51 node +  3 node gốc)
+23. ✗ Zig         ( 54 node +  1 node gốc)
+24. ✗ ES6         ( 47 node +  0 node gốc)
+    Ngôn ngữ 3-24: mới ở mức sàn (gaps.mjs "đủ"); chưa đủ method cho mỗi
+    kiểu, hàm / lớp cho mỗi module chuẩn, API chính cho mỗi framework.
+    Đổi ✗ thành ✓ khi đạt điều kiện "Xong một ngôn ngữ" ở mục 1 bên dưới.
+
+
+VIỆC TIẾP THEO (theo thứ tự)
+----------------------------
+1. ĐÀO SÂU TỪNG NGÔN NGỮ TỪ GỐC ĐẾN NGỌN
+   Làm xong hẳn một ngôn ngữ (mọi mục + mọi node gốc hệ sinh thái của nó)
+   rồi mới sang ngôn ngữ khác. Chỉ tiêu là MỨC SÀN, không phải trần: ngôn
+   ngữ nhiều chi tiết / module / framework thì nhiều node là bình thường.
+   - HTML: mỗi thẻ có nhánh con cho TỪNG thuộc tính thẻ đó dùng được
+     (a[href], a[target], img[srcset], input[min], form[method], video[poster],
+     iframe[sandbox]...); thuộc tính toàn cục ([id], [hidden], [tabindex],
+     [contenteditable], [popover]...); mọi input type; các thẻ còn thiếu
+     (head / body, link, script, style, figure, time, abbr, sub / sup,
+     dl, option / optgroup, thead / tbody, progress, meter, template...).
+   - CSS: mỗi thuộc tính có node con cho từng giá trị / biến thể (display:
+     none / block / inline-block, background-size: cover, transform:
+     rotate(), justify-content: space-between, overflow: hidden,
+     filter: blur()...); đủ pseudo-class, pseudo-element, đơn vị, hàm màu;
+     các thuộc tính còn thiếu (color, cursor, visibility, pointer-events,
+     clip-path, backdrop-filter, scroll-snap, vertical-align...).
+     Thuộc tính gộp (shorthand) phải phân nhánh ra từng thuộc tính con,
+     mỗi con một node có Kết quả: padding -> padding-top / -right /
+     -bottom / -left (+ padding-inline / padding-block); margin, border
+     (-width / -style / -color, từng cạnh), border-radius (từng góc),
+     background (-color / -image / -size / -position / -repeat...), font
+     (-family / -size / -weight / -style...), flex (-grow / -shrink /
+     -basis), grid-template, grid-area, inset, overflow (-x / -y),
+     transition (-property / -duration / -timing-function / -delay),
+     animation (-name / -duration / -iteration-count / -direction...),
+     outline, list-style, text-decoration, columns, gap (row / column).
+   - Ngôn ngữ lập trình (càng chi tiết càng tốt): mỗi kiểu có ĐỦ method
+     hay dùng; mỗi module thư viện chuẩn có các hàm / lớp chính; từ khóa, toán tử, cú pháp đặc biệt
+     mỗi cái một node; framework / thư viện có đủ API chính (hook,
+     decorator, lệnh CLI, cấu hình).
+   Thứ tự: HTML, CSS, JavaScript, Python, TypeScript, Java, C#, Go, Rust,
+   Kotlin, Swift, PHP, C++, C, SQL, Ruby, Dart, R, Scala, Lua, Elixir,
+   Haskell, Zig, ES6.
+   Xong một ngôn ngữ khi: gaps.mjs "đủ", audit.mjs 0, dups.mjs sạch,
+   depth.mjs (liệt kê thẻ / thuộc tính / kiểu / module chưa có con, và
+   node có code mà thiếu "## Kết quả") báo 0, review.mjs sạch (node rỗng,
+   node lá thiếu code, dòng code dài, lỗi font), đã xem trên trình duyệt,
+   đã commit. Node cũ viết trước quy tắc "Kết quả" phải bổ sung khi đào
+   sâu ngôn ngữ đó.
+2. Công cụ & DevOps dùng chung: Docker, Git, GitHub, Kubernetes, CI/CD,
+   Linux, Bash, Nginx, Terraform, cron / systemd, Linter, Formatter, IDE.
+3. Khái niệm còn rỗng (162 node gốc chưa có con): GraphQL, gRPC, OAuth,
+   rate limiting, WebRTC, microservices, cache, message queue...
+4. Đưa script nội dung từ %TEMP%\content vào repo (scripts/content/).
+
+
+KHUNG MỤC
+---------
+- Ngôn ngữ lập trình: Getting started, Syntax, Data type, Control flow,
+  Function, OOP, Error handling, Async & concurrency, [mục riêng: Browser,
+  Memory...], Module, Package, Standard library, Library, Framework,
+  Tooling & testing. Chỉ tạo mục có nội dung.
+- Khung riêng (bảng SPECIAL trong gaps.mjs / order-sections.mjs):
+  SQL: Getting started, Queries, Data type, Function, Data & schema
+  changes, Transactions, Index & performance, Security, Database systems,
+  Tooling. HTML: Getting started, Syntax, Tags, Form, Media,
+  Accessibility, SEO & meta, Tooling. CSS: Getting started, Syntax &
+  selectors, Box model, Layout, Typography & effects, Responsive,
+  Animation, Architecture, Framework, Tooling.
+- Tên mục có hậu tố ngôn ngữ ("Function (Go)"), giao diện hiện gọn
+  "Function" khi đang ở trong ngôn ngữ đó.
+- Mục liệt kê node gốc (framework, thư viện, công cụ) qua liên kết; node
+  gốc hiện như con với chuỗi cha ngôn ngữ -> mục -> node.
+
+
+ĐỊNH DẠNG CHUẨN (kiểm tra bằng audit.mjs)
+-----------------------------------------
+- Không giới hạn số con (scene và đường nối không giới hạn). Chỉ tạo item
+  khi đó là phân loại thật (như cách MDN / tài liệu chính thức chia:
+  Tags -> Inline text tags, Units / Colors, At-rules), KHÔNG gom chỉ để
+  giảm số con.
+- Data type: con là KIỂU (Basic types, String, List / Array, Map / Dict /
+  Set, Option, enum...); method là node con của kiểu (mỗi kiểu chính
+  >= 3). Không có node "X methods" đứng riêng.
+- Control flow: đúng 2 con Condition và Loop; mỗi biến thể một node.
+- Standard library: con là module hoặc nhóm module theo lĩnh vực; hàm /
+  lớp là con của module. Không hàm lẻ, không nhóm "Other utilities".
+- Thư viện / framework / công cụ bên thứ ba là NODE GỐC có @LANGUAGE, mục
+  chỉ liên kết tới; công cụ chính thức (pip, go test...) là node thường.
+
+
+QUY TẮC NỘI DUNG
+----------------
+- Node lá: mô tả 1-2 câu -> code -> ## Kết quả -> (tham số / giá trị)
+  -> lưu ý.
+- BẮT BUỘC: mọi ví dụ code phải có mục "## Kết quả" ngay sau code, cho
+  thấy chạy xong thì ra gì và func / method / thuộc tính đó làm được gì:
+  - Hàm / method: giá trị trả về, output in ra, biến bị đổi ra sao
+    (ghi cụ thể: [1, 2, 3].map(x => x * 2) -> [2, 4, 6]).
+  - Thẻ / thuộc tính HTML: trình duyệt hiện gì, hành vi gì (bấm thì mở
+    tab mới, ô báo lỗi "Vui lòng nhập email", ảnh chỉ tải khi cuộn tới...).
+  - Thuộc tính / giá trị CSS: phần tử trông / nằm ra sao sau khi áp.
+  - Lệnh CLI / công cụ: output trên terminal, file được tạo.
+  - Mỗi giá trị / biến thể trong ví dụ đều có kết quả riêng, không gộp
+    chung "hiện đúng".
+  Kết quả là chữ thuần (khối ``` hoặc gạch đầu dòng), không dùng ảnh.
+  Mỗi dòng kết quả nêu rõ thẻ / thuộc tính / selector nào tạo ra nó
+  (<h1> -> 32px...), không chỉ mô tả chung "to nhất", "đậm".
+- HTML / CSS có hiển thị: đầu mục "## Kết quả" có khối ```preview (HTML,
+  kèm <style> nếu là CSS) — app chạy nó trong khung trình duyệt thật
+  (FocusContent.jsx), nên thấy đúng cỡ chữ, màu, bố cục. Ví dụ phải tự
+  đủ (không file ảnh ngoài; dùng data: SVG). Form khi gửi / link khi bấm
+  hiện dữ liệu thay vì chuyển trang. Thêm bằng add-preview.mjs.
+- Tên: method có tiền tố người nhận (arr.map(), s.split()); hàm tĩnh giữ
+  tên lớp / module (Object.keys(), re.search()); thuộc tính HTML dạng
+  a[href]; trùng tên thì thêm ngoặc ("Loop (Go)", "Controller (Laravel)").
+- Tiêu đề tiếng Anh, duy nhất toàn DB (không phân biệt hoa thường), không
+  dấu phẩy; tên tiếng Việt và tên ngắn làm alias.
+- Chỉ dùng ký tự có trong font Square-VN (không emoji, không tab).
+
+
+QUY TRÌNH MỖI ĐỢT (script trong %TEMP%\content)
+-----------------------------------------------
+1. Viết file .md: @@FOLDER / @@CHILD / @@UPDATE (@PARENT: - để thành node
+   gốc); dùng id làm parent khi có thể.
+2. node lint-files.mjs <file>; DRY=1 node apply-tree.mjs <file>.
+3. Sao lưu server/data.db, chạy thật.
+4. node order-sections.mjs; node dups.mjs; node audit.mjs; node gaps.mjs.
+5. npm run export-data, npm run build, xem trên trình duyệt, commit, push.

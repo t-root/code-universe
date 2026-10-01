@@ -1,0 +1,133 @@
+/* -----------------------------------------------------------
+   CODE_UNIVERSE // UI
+   The only 2D element is the search bar (top centre; on phones it also
+   holds the IMU toggle). Everything else is inside the 3D canvas.
+   ----------------------------------------------------------- */
+
+.app {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* Any screen taller than it is wide: the one (landscape) layout, a quarter
+   turn clockwise, so its long side runs across (utils/screenRotation.js). */
+.app.is-rotated {
+  inset: auto;
+  top: 0;
+  left: 100vw;
+  width: 100vh;
+  width: 100dvh;
+  height: 100vw;
+  transform-origin: top left;
+  transform: rotate(90deg);
+}
+
+.canvas-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.search-bar {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: min(420px, calc(100vw - 24px));
+  padding: 6px 10px;
+  border: var(--border);
+  background: var(--bg);
+  transition: border-width 120ms linear;
+}
+
+.search-bar.is-focused {
+  border-width: 2px;
+  padding: 5px 9px;
+}
+
+.search-bar__prompt {
+  font-family: var(--font);
+  font-size: 14px;
+}
+
+.search-bar__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: var(--font);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.search-bar__input:focus {
+  border: 0;
+  padding: 0;
+}
+
+.search-bar__btn {
+  flex-shrink: 0;
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 2px 6px;
+}
+
+.search-bar__btn.is-on {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.search-bar__error {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 3px 6px;
+  border: var(--border);
+  background: var(--bg);
+  font-family: var(--font);
+  font-size: 10px;
+  word-break: break-word;
+}
+
+/* A phone on its side leaves the page only ~375px tall (the screen's
+   width): a slimmer bar, closer to the edge, leaves the keywords (which keep
+   clear of it) more room. */
+@media (max-width: 500px) {
+  .app.is-rotated .search-bar {
+    top: 6px;
+    width: min(300px, calc(100dvh - 24px));
+    padding: 3px 8px;
+  }
+  .app.is-rotated .search-bar.is-focused {
+    padding: 2px 7px;
+  }
+  .app.is-rotated .search-bar__prompt {
+    font-size: 12px;
+  }
+  .app.is-rotated .search-bar__input {
+    font-size: 11px;
+  }
+  .app.is-rotated .search-bar__btn {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
+}
+
+@media (max-width: 720px) {
+  .search-bar {
+    top: 12px;
+  }
+  .search-bar__btn {
+    padding: 6px 8px;   /* bigger touch targets */
+  }
+}

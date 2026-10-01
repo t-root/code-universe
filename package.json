@@ -1,0 +1,29 @@
+{
+  "name": "code-universe",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "predev": "node server/export.mjs",
+    "dev": "vite",
+    "prebuild": "node server/export.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "export-data": "node server/export.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.160.0",
+    "@react-three/fiber": "^8.15.19",
+    "@react-three/drei": "^9.99.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.10"
+  }
+}

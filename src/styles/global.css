@@ -1,0 +1,149 @@
+/* -----------------------------------------------------------
+   CODE_UNIVERSE // GLOBAL
+   Dark only (#000 / #00FF66), font Square-VN.
+   The 3D text uses the same font file (utils/palette.js).
+   No shadows, no gradients, no rounded corners, no glow.
+   ----------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Square';
+  src: url('/fonts/Square-VN.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Not used yet; kept for later. */
+@font-face {
+  font-family: 'Squareo';
+  src: url('/fonts/Squareo-VN.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #000000;
+  --fg: #00FF66;
+  --fg-dim: rgba(0, 255, 102, 0.55);
+  --fg-faint: rgba(0, 255, 102, 0.22);
+  --border: 1px solid #00FF66;
+  --font: 'Square', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  /* Crisp pixel rendering — these fonts look right with it. */
+  image-rendering: pixelated;
+  text-rendering: geometricPrecision;
+}
+
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  border: var(--border);
+  border-radius: 0;
+  padding: 6px 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition:
+    background-color 120ms linear,
+    color 120ms linear,
+    border-width 120ms linear;
+}
+
+button:hover,
+button:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+  outline: none;
+}
+
+button:focus-visible {
+  border-width: 2px;
+  padding: 5px 9px;
+}
+
+input {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--fg);
+  border: var(--border);
+  border-radius: 0;
+  outline: none;
+  caret-color: var(--fg);
+  padding: 6px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: border-width 120ms linear;
+}
+
+input:focus {
+  border-width: 2px;
+  padding: 5px 9px;
+}
+
+input::placeholder {
+  color: var(--fg-dim);
+}
+
+a {
+  color: var(--fg);
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+canvas {
+  display: block;
+  outline: none;
+  touch-action: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--fg-faint);
+  border: 1px solid var(--fg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg);
+}
