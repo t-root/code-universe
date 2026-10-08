@@ -107,7 +107,7 @@ export function titleSide(out, g, side, camera) {
 // screen's board (panelWire).
 const CHAMFER = 0.12; // world length cut off each leg at a corner
 const VIA_R = 0.035; // world radius of a via
-export const VIA_SIDES = 6;
+const VIA_SIDES = 6;
 
 const _d0 = new THREE.Vector3();
 const _d1 = new THREE.Vector3();
