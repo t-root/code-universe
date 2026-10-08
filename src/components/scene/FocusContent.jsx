@@ -262,7 +262,8 @@ function ContentScreen({ focus, layout, colors, font }) {
         time,
         at: s.wireAt,
         color: colors.fg,
-        fade,
+        // Thin bright lines read stronger than text at the same opacity: square it.
+        fade: fade * fade,
       });
       entry = out.entry;
       fit = out.fit;

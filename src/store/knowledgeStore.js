@@ -33,6 +33,15 @@ export const useKnowledgeStore = create((set, get) => ({
     const token = ++searchToken;
     const data = await api.search(q);
     if (token !== searchToken) return;
+    // Enter on a path, "javascript/runtime" or "javascript/runtime/": go to
+    // that node, and the bar then shows it with its closing "/".
+    if (confirmed && data.at !== null && data.at !== undefined) {
+      if (get().focus?.node.id !== data.at) get().focusNode(data.at);
+      else set({ query: `${await api.scopePath(data.at, get().via)}/` });
+      return;
+    }
+    // "javascript/runtime/": the path of where we are, nothing asked yet.
+    if (data.pending) return;
 
     if (data.results.length === 0) {
       focusToken++;
@@ -43,7 +52,9 @@ export const useKnowledgeStore = create((set, get) => ({
     const top = data.results[0].node;
     // Only a full title match (or an explicit Enter) earns the centre.
     if (confirmed || data.exact) {
-      if (get().focus?.node.id !== top.id) get().focusNode(top.id);
+      // Typed to an exact title: the text stays as typed (more may follow);
+      // only Enter or a click rewrites it as the node's path.
+      if (get().focus?.node.id !== top.id) get().focusNode(top.id, { syncQuery: confirmed });
       return;
     }
 
@@ -59,7 +70,9 @@ export const useKnowledgeStore = create((set, get) => ({
   // `pushHistory`: a step of its own (the node left goes on the back stack
   // and the forward stack is dropped, as in a browser); goBack / goForward
   // move between the stacks themselves.
-  focusNode: async (id, { pushHistory = true } = {}) => {
+  // `syncQuery`: the search bar then shows where we are, as a path
+  // ("javascript/runtime/") — what is typed after it searches in there.
+  focusNode: async (id, { pushHistory = true, syncQuery = true } = {}) => {
     const token = ++focusToken;
     // Stepping from a listing section (Framework (JavaScript)...) into one of
     // the roots it lists: remember that section as the way in, so the chain
@@ -83,6 +96,9 @@ export const useKnowledgeStore = create((set, get) => ({
         layoutRevision: s.layoutRevision + 1,
       };
     });
+    if (!syncQuery) return;
+    const path = await api.scopePath(id, via);
+    if (token === focusToken) set({ query: `${path}/` });
   },
 
   goBack: () => {

@@ -99,13 +99,16 @@ export function createSearchIndex(nodes) {
   return { entries };
 }
 
-export function search(index, rawQuery) {
+// `within`: a Set of node ids to look in (a scoped search, "javascript/runtime/x"),
+// or null for everything.
+export function search(index, rawQuery, within = null) {
   const query = rawQuery.trim().toLowerCase();
   if (!query) return { results: [], closeness: 0, exact: false };
   const tokens = query.split(/\s+/).filter(Boolean);
 
   const ranked = [];
   for (const entry of index.entries.values()) {
+    if (within && !within.has(entry.node.id)) continue;
     const score = scoreNode(entry, tokens, index);
     if (score > 0) ranked.push({ entry, score });
   }

@@ -311,7 +311,10 @@ export function RelatedHud({ linkColor }) {
       };
       const trunkCut = scratch.trunkCut;
       const trunkM = cut(trunkCut, trunkPts, trunkCount);
-      const trunk = wire(trunkCut, trunkM, trunkReach, WHITE, k * TRUNK_DIM);
+      // The trunk runs into the focus: it dims with it when the camera has
+      // swung the focus behind the scatter (utils/depthFade.js).
+      const onFocus = sceneState.depthFade.center ** 2; // squared: thin lines read stronger than text
+      const trunk = wire(trunkCut, trunkM, trunkReach, WHITE, k * TRUNK_DIM * onFocus);
       const trunkTrail = Math.min(TRUNK_TRAIL, trunk.length * 0.6);
 
       // Each keyword's trace, as routed when they were scattered.
@@ -337,7 +340,7 @@ export function RelatedHud({ linkColor }) {
         for (let pass = Math.floor(time / period - arrive); ; pass--) {
           const since = time - (pass + arrive) * period;
           if (since > lifetime) break;
-          streak(trunkCut, trunkM, trunk.end, since * STREAK_SPEED, trunkTrail, c, box.k, TRUNK_WHITEN);
+          streak(trunkCut, trunkM, trunk.end, since * STREAK_SPEED, trunkTrail, c, box.k * onFocus, TRUNK_WHITEN);
         }
       }
     }

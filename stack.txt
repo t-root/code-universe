@@ -15,27 +15,23 @@ admin khi có nội dung). Thứ tự chuẩn (tên có đuôi: "Function (Go)")
                     loop, FFI; runtime thay thế (Node.js, Deno, Bun, JVM...)
   Module            CHỈ các module có sẵn của ngôn ngữ (Math, Date, JSON...);
                     hàm / lớp là con của module. Không có "Standard library"
-  Package           gói NHỎ làm một việc, cài rồi dùng ngay (nanoid, ky,
-                    serde, clap, requests...). Chỉ có khi ngôn ngữ có từ 3
-                    gói nhỏ như vậy: JavaScript, Python, Rust, Go, Java,
-                    Kotlin, C#, PHP, Dart
   Package manager   công cụ (npm, pip, cargo...), lệnh cài / chạy script, và
                     tệp khai báo (package.json, Cargo.toml, go.mod), semver,
                     lockfile, workspace, xuất bản
-  Library           thư viện bên thứ ba lớn, nhiều phần (Lodash, RxJS, NumPy)
+  Library           thư viện / gói bên thứ ba (Lodash, nanoid, NumPy, serde...)
   Framework         framework (React, Express, Django...)
   Testing           framework test, assertion, mock, coverage, E2E
   Tooling           debug, profiling, lint, formatter, build, IDE / LSP
   Best practices    style guide, đặt tên, idiom, design pattern, hiệu năng,
                     bảo mật
 
-- Chuỗi tăng dần: Module (của ngôn ngữ) -> Package -> Library -> Framework.
-  Một thứ thuộc Package HOẶC Library, không cả hai (chuyển đi, không nhân
-  đôi). Phân biệt theo độ lớn: gói làm một việc (id, HTTP client, log,
-  băm mật khẩu) là Package; bộ công cụ nhiều phần (Lodash, D3, Pandas) là
-  Library.
-- Dựng / chỉnh lại các mục: node server/shape-languages.mjs (danh sách gói
-  nhỏ từng ngôn ngữ nằm trong script; bỏ mục rỗng; xếp đúng thứ tự).
+- Chuỗi tăng dần: Module (của ngôn ngữ) -> Library -> Framework. Gói nhỏ
+  (nanoid, ky, serde...) cũng là Library, không có mục Package riêng trong
+  từng ngôn ngữ. "Package" chỉ là 1 note chung (root, không thuộc ngôn ngữ nào)
+  giải thích khái niệm gói và liên quan tới Module, npm, pip và vài package
+  tiêu biểu (Lodash, requests, Serde...).
+- Dựng / chỉnh lại các mục: node server/shape-languages.mjs (bỏ mục rỗng,
+  xếp đúng thứ tự).
 - Library / Framework / công cụ bên thứ ba là NODE GỐC (parent rỗng, có
   language); mục chỉ liệt kê chúng qua liên kết, hiện như con. Công cụ chính
   thức đi kèm ngôn ngữ (go test, pip...) là node thường trong cây.

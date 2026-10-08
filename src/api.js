@@ -66,6 +66,42 @@ function db() {
   return ready;
 }
 
+// A node's children: its own, then the roots a language section lists.
+const childrenOf = (data, id) => [
+  ...(data.childrenByParent.get(id) ?? []),
+  ...(data.byId.get(id)?.listed_ids ?? []).map((rid) => data.byId.get(rid)).filter(Boolean),
+];
+
+// Slug segments -> node id like api.resolve, but a section's listed roots
+// ("javascript/framework/react") count as its children too. null: no such path.
+function resolvePath(data, slugs) {
+  let id = null;
+  for (const slug of slugs) {
+    const list = id === null ? data.roots : childrenOf(data, id);
+    const hit = list.find((n) => data.slugOf.get(n.id) === slug);
+    if (!hit) return null;
+    id = hit.id;
+  }
+  return id;
+}
+
+// Every node under `id` (not itself): children, what sections list, and so on.
+const scopes = new Map();
+function under(data, id) {
+  if (scopes.has(id)) return scopes.get(id);
+  const seen = new Set();
+  const stack = [id];
+  while (stack.length) {
+    for (const n of childrenOf(data, stack.pop())) {
+      if (seen.has(n.id)) continue;
+      seen.add(n.id);
+      stack.push(n.id);
+    }
+  }
+  scopes.set(id, seen);
+  return seen;
+}
+
 const languageOf = (data, node) => {
   let n = node;
   while (n && n.parent_id !== null) n = data.byId.get(n.parent_id);
@@ -145,6 +181,13 @@ export const api = {
     }
     return parts.join('/');
   },
+  // The path the search bar shows for a node: every owner above it too
+  // (javascript/testing/jest), which search resolves back to the node.
+  scopePath: async (id, via) => {
+    const data = await db();
+    const d = detail(data, id, via);
+    return [...d.owners, ...d.path, d].map((n) => data.slugOf.get(n.id)).join('/');
+  },
   // Slug segments -> node id, or null when the path no longer exists.
   resolve: async (segments) => {
     const data = await db();
@@ -155,9 +198,28 @@ export const api = {
     }
     return id;
   },
+  // "javascript/runtime/node": everything before the last "/" is a path
+  // (slugs, as in the URL) that narrows the search to what lies under it.
+  // `pending`: the path is there but nothing after it yet.
   search: async (q) => {
     const data = await db();
-    const result = searchNodes(data.index, q);
-    return { ...result, results: result.results.map((r) => ({ ...r, node: light(r.node) })) };
+    const cut = q.lastIndexOf('/');
+    let text = q;
+    let within = null;
+    // `at`: the node the whole text names as a path, with or without the
+    // closing "/" (Enter goes there).
+    let at = null;
+    if (cut >= 0) {
+      const slugs = (s) => s.split('/').map(slugify).filter(Boolean);
+      at = resolvePath(data, slugs(q));
+      const scope = resolvePath(data, slugs(q.slice(0, cut)));
+      text = q.slice(cut + 1);
+      if (scope !== null) {
+        if (!text.trim()) return { results: [], closeness: 0, exact: false, pending: true, at };
+        within = under(data, scope);
+      }
+    }
+    const result = searchNodes(data.index, text, within);
+    return { ...result, at, results: result.results.map((r) => ({ ...r, node: light(r.node) })) };
   },
 };

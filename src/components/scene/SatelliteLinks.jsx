@@ -92,7 +92,8 @@ export function SatelliteLinks({ color }) {
     if (!traces.current || !streaks.current) return;
     // The traces belong to the focus group: they fade with it when the
     // camera has swung another part in front (utils/depthFade.js).
-    const fade = sceneState.depthFade.center;
+    // Squared: thin lines read stronger than text at the same opacity.
+    const fade = sceneState.depthFade.center ** 2;
     traces.current.material.opacity = TRACE_DIM * fade;
     streaks.current.material.opacity = fade;
 

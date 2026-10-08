@@ -297,7 +297,7 @@ function fillFilters() {
   const secs = count((n) => (isSection(n) ? sectionName(n) : null));
   const order = [
     'Fundamentals', 'Getting started', 'Syntax', 'Variable', 'Data type', 'Control flow', 'Function', 'OOP', 'Error handling',
-    'Async & concurrency', 'Runtime', 'Module', 'Standard library', 'Package', 'Package manager', 'Library', 'Framework', 'Testing',
+    'Async & concurrency', 'Runtime', 'Module', 'Standard library', 'Package manager', 'Library', 'Framework', 'Testing',
     'Tooling', 'Best practices', 'Tooling & testing',
   ];
   fill(
