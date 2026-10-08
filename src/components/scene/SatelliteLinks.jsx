@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useKnowledgeStore } from '../../store/knowledgeStore.js';
-import { sceneState } from '../../utils/sceneLayout.js';
+import { hasLanded, sceneState } from '../../utils/sceneLayout.js';
 import {
   GLOW_WHITEN,
   MAX_POINTS,
@@ -120,7 +120,7 @@ export function SatelliteLinks({ color }) {
       G.at = null;
       sceneState.childArrival.clear();
     }
-    if (G.at === null && focusGroup && !focusGroup.userData.inFlight && focusGroup.scale.x > 0.3) {
+    if (G.at === null && hasLanded(focusGroup)) {
       G.at = time;
       for (const l of links) if (l.child) sceneState.childArrival.set(l.to, time + l.delay + GROW_TIME);
     }

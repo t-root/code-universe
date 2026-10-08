@@ -12,7 +12,9 @@
     "prebuild": "node server/export.mjs",
     "build": "vite build",
     "preview": "vite preview",
-    "export-data": "node server/export.mjs"
+    "export-data": "node server/export.mjs",
+    "content": "node server/import-md.mjs",
+    "check": "node server/check.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

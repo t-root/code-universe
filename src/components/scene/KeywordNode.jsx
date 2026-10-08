@@ -59,7 +59,8 @@ export function KeywordNode({ node, initialPosition }) {
       : percent > 0 ? ` ${percent}%` : '';
   // Anything that isn't a language itself (framework, library, module...)
   // also names the language it belongs to.
-  const owner = node.owner_language ? ` / ${node.owner_language}` : '';
+  const ownSuffix = !!node.language && node.title.endsWith(`(${node.language})`);
+  const owner = node.owner_language ? ` / ${node.owner_language}` : ownSuffix ? ` / ${node.language}` : '';
   const badge = `[${`${node.category}${owner}`.toUpperCase()}]${tail}`;
   const phase = (node.id * 2.399) % (Math.PI * 2);
   // A title drops its "(ASP.NET)" / "(CSS)" suffix while the scene already
@@ -76,7 +77,9 @@ export function KeywordNode({ node, initialPosition }) {
     if (!kids.some((c) => c.id === node.id)) return false;
     return kids.filter((c) => (c.short_title ?? bareTitle(c.title)) === brief).length === 1;
   });
-  const label = inContext ? brief : node.title;
+  // A "(JavaScript)" suffix only keeps titles unique; the label never shows it
+  // (the badge names the language instead).
+  const label = inContext || ownSuffix ? brief : node.title;
 
   const basePos = useMemo(() => new THREE.Vector3(...initialPosition), [initialPosition]);
   const target = useMemo(() => new THREE.Vector3(), []);

@@ -48,9 +48,11 @@ function scoreNode(entry, tokens, index) {
   for (const t of tokens) {
     let s = 0;
     if (title === t) s = 100;
-    else if (aliases.includes(t)) s = 90;
-    // Prefix: ramps toward (never reaching) 100 as more of the title is typed.
-    else if (title.startsWith(t)) s = 60 + Math.round(39 * (t.length / title.length));
+    // An alias hit (90) or a prefix hit, whichever is higher. A prefix ramps
+    // toward (never reaching) 100 as more of the title is typed.
+    else if (aliases.includes(t) || title.startsWith(t)) {
+      s = Math.max(aliases.includes(t) ? 90 : 0, title.startsWith(t) ? 60 + Math.round(39 * (t.length / title.length)) : 0);
+    }
     // Query containing the whole title only counts for real words — otherwise
     // one-letter titles like "C" would match anything with a c in it.
     else if (title.includes(t) || (title.length >= 3 && t.includes(title))) s = 60;
@@ -80,11 +82,17 @@ export function createSearchIndex(nodes) {
     entries.set(node.id, {
       node: light,
       kindRank: kind_rank,
-      title: node.title.toLowerCase(),
-      aliases: aliases.map((a) => a.toLowerCase()),
+      // The title as shown ("Map", not "Map (JavaScript)"): the language
+      // suffix only keeps titles unique, so it must not make "javas" match
+      // every JavaScript note. The full title stays searchable as an alias.
+      title: (node.short_title ?? node.title).toLowerCase(),
+      aliases: [...new Set([...aliases, node.title].map((a) => a.toLowerCase()))],
       relatedIds: related_ids,
       category: (node.category ?? '').toLowerCase(),
       language: (node.language ?? '').toLowerCase(),
+      // Belongs to one programming language (a node inside its tree, or a
+      // root it owns). General words rank above these when titles tie.
+      owned: !!node.owner_language || (node.parent_id !== null && !!node.language),
       text: `${description ?? ''}\n${raw_text ?? ''}`.toLowerCase(),
     });
   }
@@ -105,6 +113,8 @@ export function search(index, rawQuery) {
   ranked.sort(
     (a, b) =>
       b.score - a.score ||
+      // a general word lands on its language-neutral hub, not on one language's node
+      a.entry.owned - b.entry.owned ||
       b.entry.node.importance - a.entry.node.importance ||
       a.entry.kindRank - b.entry.kindRank
   );

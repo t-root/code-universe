@@ -70,21 +70,30 @@ for (const r of rows) {
 // carries it as `owner_language`, so the scene can say whose it is. Only
 // top-level keywords get it; values like 'Web', 'Concept' or 'Tooling'
 // aren't languages and are left out.
-const languageTitles = new Set(
-  rows.filter((r) => r.parent_id === null && r.category === 'Language').map((r) => r.title)
-);
+// HTML, CSS and SQL are not programming languages (they are filed under
+// Web / Database) but they behave like languages (sections, owned roots).
+const SPECIAL_LANGUAGES = new Set(['HTML', 'CSS', 'SQL']);
+const isLanguage = (r) => r.parent_id === null && (r.category === 'Language' || SPECIAL_LANGUAGES.has(r.title));
+const languageTitles = new Set(rows.filter(isLanguage).map((r) => r.title));
 
 // A language's section (an item right under a language root) may also list
 // other roots it links to — Framework (JavaScript) -> React, Vue...; Package
 // (JavaScript) -> npm. Those roots are shown as extra children next to the
 // section's own notes, and counted in its badge.
 const rowById = new Map(rows.map((r) => [r.id, r]));
+// The sections also include the ones grouped under Fundamentals / Module
+// (OOP, Standard library...).
+const GROUPS = ['Fundamentals', 'Module'];
+const isSectionOf = (r, parent) =>
+  parent.parent_id === null
+    ? isLanguage(parent)
+    : GROUPS.some((g) => parent.title === `${g} (${rowById.get(parent.parent_id)?.title})`);
 const listedIds = (r) => {
   const parent = rowById.get(r.parent_id);
-  if (r.kind !== 'item' || !parent || parent.parent_id !== null || parent.category !== 'Language') return [];
+  if (r.kind !== 'item' || !parent || !isSectionOf(r, parent)) return [];
   return [...(relatedByNode.get(r.id) ?? [])].filter((id) => {
     const n = rowById.get(id);
-    return n && n.parent_id === null && n.category !== 'Language';
+    return n && n.parent_id === null && !isLanguage(n);
   });
 };
 
@@ -94,7 +103,7 @@ const listedIds = (r) => {
 const shortTitle = (r) => {
   let top = rowById.get(r.parent_id);
   while (top && top.parent_id !== null) top = rowById.get(top.parent_id);
-  const suffix = top && top.category === 'Language' ? ` (${top.title})` : null;
+  const suffix = top && isLanguage(top) ? ` (${top.title})` : null;
   return suffix && r.title.endsWith(suffix) ? r.title.slice(0, -suffix.length) : null;
 };
 
@@ -103,7 +112,7 @@ const nodes = rows.map((r) => ({
   short_title: shortTitle(r),
   listed_ids: listedIds(r),
   owner_language:
-    r.parent_id === null && r.category !== 'Language' && languageTitles.has(r.language) ? r.language : null,
+    r.parent_id === null && !isLanguage(r) && languageTitles.has(r.language) ? r.language : null,
   child_count: (childCount.get(r.id) ?? 0) + listedIds(r).length,
   aliases: aliasesByNode.get(r.id) ?? [],
   related_ids: [...(relatedByNode.get(r.id) ?? [])],

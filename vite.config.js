@@ -17,9 +17,20 @@ const spaFallback = () => {
   };
 };
 
+// The data admin (admin/ + server/admin.mjs) lives on the dev server at
+// /admin; it is never part of the built site.
+const adminPanel = () => ({
+  name: 'admin-panel',
+  apply: 'serve',
+  async configureServer(server) {
+    const { adminMiddleware } = await import('./server/admin.mjs');
+    server.middlewares.use(adminMiddleware());
+  },
+});
+
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/code-universe/' : '/',
-  plugins: [react(), spaFallback()],
+  plugins: [react(), spaFallback(), adminPanel()],
   server: {
     port: 5199,
     strictPort: true,

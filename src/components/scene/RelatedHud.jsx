@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useKnowledgeStore } from '../../store/knowledgeStore.js';
 import { damp } from '../../utils/animations.js';
-import { sceneState } from '../../utils/sceneLayout.js';
+import { sceneState, ancestorPosition, CAMERA_FOV, FOCUS_CAMERA_RADIUS } from '../../utils/sceneLayout.js';
 import { RELATED_FRAME_PAD as PAD } from '../../utils/declutter.js';
 import {
   GLOW_WHITEN,
@@ -163,7 +163,28 @@ export function RelatedHud({ linkColor }) {
           // A crowded list may come back shrunk (KeywordNode scales the
           // labels by relatedFit) and / or with the area widened toward the
           // focus: the trunk leaves on that side of it.
-          const { spots, area, fit, items: fitted } = scatterRelated(items, R.area, R.hub, seed, R.maxX1);
+          // The ancestor chain's labels, mapped onto the scatter's plane (the
+          // same screen spot), are off limits.
+          const tanHalf = Math.tan((CAMERA_FOV * Math.PI) / 360);
+          const halfAt = (z) => tanHalf * (FOCUS_CAMERA_RADIUS - z);
+          const obstacles = [];
+          for (const [aid, arole] of sceneState.roles) {
+            if (arole.type !== 'parent') continue;
+            const ag = sceneState.registry.get(aid);
+            if (!ag?.userData.textWidth) continue;
+            const p = ancestorPosition(scratch.a, arole.depth, L);
+            const k = halfAt(R.z) / halfAt(p.z);
+            const gl = glyphs(ag);
+            const sc = (ag.userData.restScale ?? 1) * k;
+            obstacles.push({
+              x: p.x * k,
+              y: p.y * k,
+              hw: gl.hw * sc + PAD,
+              top: gl.top * sc + PAD,
+              bottom: gl.bottom * sc + PAD,
+            });
+          }
+          const { spots, area, fit, items: fitted } = scatterRelated(items, R.area, R.hub, seed, R.maxX1, obstacles);
           sceneState.relatedFit = fit;
           exit.copy(R.exit).setX(Math.max(R.exit.x, area.x1 + 0.3));
           const { routes, out } = routeRelated(fitted, spots, area, R.hub, exit, seed);

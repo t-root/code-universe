@@ -45,6 +45,17 @@ export const sceneState = {
   childArrival: new Map(),
   layout: computeLayout(16, 9, 0),
 };
+// A focus keyword has landed once its flight is over and it has grown to
+// (nearly) the size it rests at. Its rest size isn't fixed: a long title
+// shrinks to fit the screen (KeywordNode), so a fixed threshold would never
+// be met for it — and the ancestor traces and the content column that wait
+// for the landing would never appear.
+export function hasLanded(g) {
+  if (!g || g.userData.inFlight) return false;
+  const rest = g.userData.restScale;
+  return rest !== undefined && g.scale.x >= 0.75 * Math.min(rest, 0.4);
+}
+
 // World-space arc length each satellite wants on its ring; a crowded ring
 // grows until its labels get this much room (as far as the screen allows).
 const SATELLITE_SPACING = 2.3;

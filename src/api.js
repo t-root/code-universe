@@ -29,7 +29,7 @@ async function load() {
   const byOrderThenTitle = (a, b) => a.order_index - b.order_index || a.title.localeCompare(b.title);
   for (const list of childrenByParent.values()) list.sort(byOrderThenTitle);
   const roots = nodes.filter((n) => n.parent_id === null).sort((a, b) => a.order_index - b.order_index);
-  const languageByTitle = new Map(roots.filter((n) => n.category === 'Language').map((n) => [n.title, n]));
+  const languageByTitle = new Map(roots.filter((n) => n.category === 'Language' || ['HTML', 'CSS', 'SQL'].includes(n.title)).map((n) => [n.title, n]));
 
   // Roots listed by a language section (Framework, Library, Package...):
   // root id -> the sections that list it.
@@ -66,6 +66,12 @@ function db() {
   return ready;
 }
 
+const languageOf = (data, node) => {
+  let n = node;
+  while (n && n.parent_id !== null) n = data.byId.get(n.parent_id);
+  return n;
+};
+
 // The chain above a root that isn't really anyone's child: a framework /
 // library / tool listed by a language section hangs off that section
 // (language -> section -> root); otherwise off its language alone. `via`
@@ -74,11 +80,13 @@ function ownersOf(data, top, via) {
   const sections = data.listedIn.get(top.id) ?? [];
   const section =
     sections.find((s) => s.id === via) ??
-    sections.find((s) => data.byId.get(s.parent_id)?.title === top.owner_language) ??
+    sections.find((s) => languageOf(data, s)?.title === top.owner_language) ??
     sections[0];
   if (section) {
-    const language = data.byId.get(section.parent_id);
-    return language ? [light(language), light(section)] : [light(section)];
+    // language -> (Fundamentals ->) section -> root
+    const chain = [];
+    for (let p = data.byId.get(section.parent_id); p; p = data.byId.get(p.parent_id)) chain.unshift(light(p));
+    return [...chain, light(section)];
   }
   const language = top.owner_language ? data.languageByTitle.get(top.owner_language) : null;
   return language ? [light(language)] : [];

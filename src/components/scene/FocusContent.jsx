@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { useKnowledgeStore } from '../../store/knowledgeStore.js';
 import { damp, floatingOffset } from '../../utils/animations.js';
 import { COLORS, FONT } from '../../utils/palette.js';
-import { sceneState } from '../../utils/sceneLayout.js';
+import { hasLanded, sceneState } from '../../utils/sceneLayout.js';
 import { WIRE_SEGMENTS, WIRE_TIME, drawPanelWire, makeBoard } from '../../utils/panelWire.js';
 import '../../styles/holo.css';
 
@@ -249,7 +249,7 @@ function ContentScreen({ focus, layout, colors, font }) {
     // ---- The wire, once the focus has landed; the screen switches on
     // when it is in.
     const focusGroup = sceneState.registry.get(node.id);
-    if (s.wireAt === undefined && focusGroup && !focusGroup.userData.inFlight && focusGroup.scale.x > 0.3) s.wireAt = time;
+    if (s.wireAt === undefined && hasLanded(focusGroup)) s.wireAt = time;
     let entry = 0; // where the trunk meets the screen, above its centre
     let fit = 1; // how far the board is shrunk
     let shown = null; // which of its ports have a trace drawn

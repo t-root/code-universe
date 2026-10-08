@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Code Universe · Admin</title>
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <header id="top">
+      <strong class="brand">CODE UNIVERSE <span>admin</span></strong>
+      <span id="stats" class="muted"></span>
+      <span class="spacer"></span>
+      <button id="btn-meta" title="Quản lý category và kind">Category / Kind</button>
+      <button id="btn-backup" title="Sao chép data.db vào server/backups/">Sao lưu DB</button>
+      <button id="btn-export" class="primary" title="Chạy server/export.mjs để ghi public/data.json">Xuất data.json</button>
+      <a class="btn" href="/" target="_blank" rel="noopener">Mở app ↗</a>
+    </header>
+
+    <main>
+      <aside id="side">
+        <div class="side-tools">
+          <input id="filter" type="search" placeholder="Tìm theo tiêu đề hoặc #id…" autocomplete="off" />
+          <div class="filters">
+            <select id="f-category" title="Nhóm của node: Language, Framework, Library, Runtime, Tooling, Concept..."></select>
+            <select id="f-language" title="Node thuộc ngôn ngữ nào (cả framework / thư viện của ngôn ngữ đó)"></select>
+            <select id="f-section" title="Mục trong một ngôn ngữ: Fundamentals, Module, Library, Package manager, Framework..."></select>
+            <select id="f-kind" title="Loại node: concept, item, topic, function..."></select>
+          </div>
+          <div class="row-btns">
+            <button id="btn-root">+ Gốc</button>
+            <select id="f-level" title="Hiển thị N tầng: mở các nhánh nông hơn, đóng nhánh sâu hơn">
+              <option value="">Mở tới cấp…</option>
+              <option value="1">Cấp 1 · chỉ node gốc</option>
+              <option value="2">Cấp 2 · gốc + con</option>
+              <option value="3">Cấp 3</option>
+              <option value="4">Cấp 4</option>
+              <option value="5">Cấp 5</option>
+              <option value="6">Cấp 6</option>
+              <option value="99">Tất cả</option>
+            </select>
+            <button id="btn-clear">Xóa lọc</button>
+          </div>
+          <div id="tree-count" class="muted"></div>
+        </div>
+        <div id="tree" tabindex="0"></div>
+      </aside>
+      <section id="editor"></section>
+    </main>
+
+    <div id="toasts"></div>
+    <script type="module" src="/admin/app.js"></script>
+  </body>
+</html>

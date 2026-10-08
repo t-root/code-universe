@@ -35,22 +35,33 @@ const overlaps = (p, q) => p.x0 < q.x1 && q.x0 < p.x1 && p.y0 < q.y1 && q.y0 < p
 // When they don't all fit cleanly: shrink every label by these factors in
 // turn, trying each first in the area as given, then widened toward the
 // focus to maxX1; at the last, the least-bad spots are kept.
-const FITS = [1, 0.9, 0.8, 0.7, 0.6];
+const FITS = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.42];
+
+// The more keywords, the smaller they all start (the list stays readable
+// instead of every label fighting for room): 1 up to 4, then -4% each.
+const baseFit = (n) => Math.min(1, Math.max(0.5, 1 - 0.04 * (n - 4)));
 
 /**
  * items: [{ id, hw, top, bottom }] — each frame's half-width and how far it
  * reaches above / below its centre, at full size. area: { x0, x1, y0, y1 }
  * the frames must stay inside. hub: { x, y }. Returns { spots: Map id ->
  * { x, y } centre, area: the area used, fit: the factor the labels must be
- * scaled by (1 = as given) }.
+ * scaled by (1 = as given) }. obstacles: [{ x, y, hw, top, bottom }] labels
+ * of other parts of the scene (the ancestor chain) that nothing may cover.
  */
-export function scatterRelated(items, area, hub, seed, maxX1 = area.x1) {
+export function scatterRelated(items, area, hub, seed, maxX1 = area.x1, obstacles = []) {
   let last = null;
-  for (const fit of FITS) {
+  const start = baseFit(items.length);
+  let prevFit = 0;
+  for (const rung of FITS) {
+    // Never smaller than still reads; rungs that land on the floor repeat.
+    const fit = Math.max(0.45, rung * start);
+    if (fit === prevFit) continue;
+    prevFit = fit;
     const scaled = items.map((it) => ({ ...it, hw: it.hw * fit, top: it.top * fit, bottom: it.bottom * fit }));
     for (const x1 of maxX1 > area.x1 ? [area.x1, maxX1] : [area.x1]) {
       const tried = { ...area, x1 };
-      const { spots, clean } = scatterIn(scaled, tried, hub, seed);
+      const { spots, clean } = scatterIn(scaled, tried, hub, seed, obstacles);
       last = { spots, area: tried, fit, items: scaled };
       if (clean) return last;
     }
@@ -58,9 +69,13 @@ export function scatterRelated(items, area, hub, seed, maxX1 = area.x1) {
   return last;
 }
 
-function scatterIn(items, area, hub, seed) {
+function scatterIn(items, area, hub, seed, obstacles = []) {
   const rand = random(seed);
-  const placed = [];
+  const placed = obstacles.map((o) => ({
+    x: o.x,
+    y: o.y,
+    box: { x0: o.x - o.hw - MARGIN, x1: o.x + o.hw + MARGIN, y0: o.y - o.bottom - MARGIN, y1: o.y + o.top + MARGIN },
+  }));
   const spots = new Map();
   let clean = true;
   for (const it of items) {
